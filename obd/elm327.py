@@ -305,8 +305,10 @@ class ELM327:
 
         for baud in self._TRY_BAUDS:
             self.__port.baudrate = baud
-            self.__port.flushInput()
-            self.__port.flushOutput()
+            #self.__port.flushInput() # dump everything in the input buffer               !---- used in pyserial earlier than 3.0
+            #self.__port.flushOutput() # dump everything in the input buffer              !---- used in pyserial earlier than 3.0
+            self.__port.reset_input_buffer() # dump everything in the input buffer        !---- used in pyserial 3.0 and later
+            self.__port.reset_output_buffer() # dump everything in the input buffer       !---- used in pyserial 3.0 and later
 
             # Send a nonsense command to get a prompt back from the scanner
             # (an empty command runs the risk of repeating a dangerous command)
@@ -322,7 +324,9 @@ class ELM327:
             logger.debug("Response from baud %d: %s" % (baud, repr(response)))
 
             # watch for the prompt character
-            if response.endswith(b">"):
+            #if response.endswith(b">"):
+            # TODO: remove (if b">" in response) and revert to (if response.endswith) before final push/merge
+            if b">" in response:  # I am getting '>' with the STN11xx, but not at the end; edit - only occurs when car power = off
                 logger.debug("Choosing baud %d" % baud)
                 self.__port.timeout = timeout # reinstate our original timeout
                 return True
