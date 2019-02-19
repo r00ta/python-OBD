@@ -273,7 +273,7 @@ class OBD(object):
 
         self.__set_header(cmd.header)
 
-        logger.info("Sending command: %s" % str(cmd))
+        logger.debug("Sending command: %s" % str(cmd))
         cmd_string = self.__build_command_string(cmd)
         messages = self.interface.send_and_parse(cmd_string)
 
